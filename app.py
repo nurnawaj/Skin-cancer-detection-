@@ -184,9 +184,11 @@ if page == "Home":
         )
 
     st.write("")
-    if st.button("🖼️ Upload Image →", type="primary"):
+
+    def _go_to_prediction():
         st.session_state["nav_radio"] = "Prediction"
-        st.rerun()
+
+    st.button("🖼️ Upload Image →", type="primary", on_click=_go_to_prediction)
 
     st.caption("Supported formats: JPG / JPEG / PNG")
     st.markdown(f'<div class="disclaimer-box">{DISCLAIMER_TEXT}</div>', unsafe_allow_html=True)
