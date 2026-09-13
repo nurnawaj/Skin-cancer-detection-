@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Data & models (large binary/dataset files should not be committed)
+dataset/HAM10000_images/*
+!dataset/HAM10000_images/.gitkeep
+dataset/HAM10000_metadata.csv
+dataset/train.csv
+dataset/val.csv
+dataset/test.csv
+models/*.pth
+
+# Results (generated artifacts)
+results/*.png
+results/*.json
+results/*.txt
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/

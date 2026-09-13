@@ -255,4 +255,5 @@ diagnosis or treatment decisions. It is intended solely for educational
 and research demonstration of a deep-learning image-classification
 pipeline.
 #   S k i n - c a n c e r - d e t e c t i o n -  
+ #   S k i n - c a n c e r - d e t e c t i o n -  
  
