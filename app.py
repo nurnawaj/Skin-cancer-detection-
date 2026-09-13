@@ -119,7 +119,12 @@ with st.sidebar:
     st.caption("AI-Powered Skin Lesion Classification")
     st.divider()
 
-    page = st.radio("Navigate", ["Home", "Prediction", "Model Analytics", "About"], label_visibility="collapsed")
+    page = st.radio(
+        "Navigate",
+        ["Home", "Prediction", "Model Analytics", "About"],
+        key="nav_radio",
+        label_visibility="collapsed",
+    )
 
     st.divider()
     st.markdown("**Model status**")
@@ -180,7 +185,7 @@ if page == "Home":
 
     st.write("")
     if st.button("🖼️ Upload Image →", type="primary"):
-        st.session_state["_nav_hint"] = "Prediction"
+        st.session_state["nav_radio"] = "Prediction"
         st.rerun()
 
     st.caption("Supported formats: JPG / JPEG / PNG")
