@@ -1,75 +1,84 @@
+
 # DermaAI — Skin Lesion Classification System
 
-DermaAI is an educational, research-oriented deep-learning project that
-classifies dermoscopic skin-lesion images into one of the diagnostic
-categories found in the **HAM10000** dataset, using transfer learning
-(ResNet18) and a modern Streamlit web interface.
+DermaAI is an educational, research-oriented deep-learning project that classifies dermoscopic skin-lesion images into diagnostic categories from the **HAM10000** dataset using transfer learning (ResNet18) and a modern Streamlit web interface.
 
 > ⚠️ **Medical Disclaimer**
-> This project is for **educational and research purposes only**. It is
-> **not** a medical device and must **not** be used for diagnosis or
-> treatment decisions. Predictions can be wrong. Always consult a
-> qualified dermatologist or healthcare professional.
+>
+> This project is for **educational and research purposes only**. It is not a medical device and must not be used for diagnosis or treatment decisions. Predictions can be wrong. Always consult a qualified dermatologist or healthcare professional.
 
 ---
 
 ## 1. Features
 
-- End-to-end pipeline: data prep → training → evaluation → prediction → web app
+- End-to-end pipeline: data preparation → training → evaluation → prediction → web app
 - Automatic class detection from metadata (no hard-coded label list)
-- Leakage-aware, reproducible train/val/test split (grouped by lesion when possible)
-- Class-weighted loss to handle HAM10000's class imbalance
-- ResNet18 transfer learning, modular so ResNet50 / EfficientNet can be added later
-- AdamW + ReduceLROnPlateau + early stopping
-- Full checkpoint (weights + class mapping + config), not just raw weights
-- Real metrics only: accuracy, precision, recall, F1 (macro & weighted), confusion matrix, ROC-AUC
+- Leakage-aware, reproducible train/validation/test split (grouped by lesion when possible)
+- Class-weighted loss to handle HAM10000 class imbalance
+- ResNet18 transfer learning architecture
+- Modular support for ResNet50 and EfficientNet
+- AdamW optimizer, ReduceLROnPlateau scheduler, and early stopping
+- Full model checkpoint (weights + class mapping + configuration)
+- Real evaluation metrics: accuracy, precision, recall, F1-score, confusion matrix, and ROC-AUC
 - Optional Grad-CAM interpretability visualization
-- Modern dark-themed Streamlit dashboard with Home / Prediction / Model Analytics / About pages
-- Friendly error handling for missing data, corrupted images, missing model, unsupported formats
+- Modern dark-themed Streamlit dashboard with Home, Prediction, Model Analytics, and About pages
+- Error handling for missing data, corrupted images, missing models, and unsupported formats
 
 ---
 
 ## 2. Technology Stack
 
-**ML/DL:** Python 3.10+, PyTorch, Torchvision, NumPy, Pandas, Scikit-learn,
-Matplotlib, Seaborn, Pillow, OpenCV, tqdm
+**Machine Learning / Deep Learning:**
+- Python 3.10+
+- PyTorch
+- Torchvision
+- NumPy
+- Pandas
+- Scikit-learn
+- Matplotlib
+- Seaborn
+- Pillow
+- OpenCV
+- tqdm
 
-**Web app:** Streamlit
+**Web Application:**
+- Streamlit
 
 ---
 
 ## 3. Project Structure
 
-```
+```text
 derma-ai/
 │
-├── app.py                     # Streamlit web application
+├── app.py
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
 │
 ├── config/
-│   └── config.py               # All configurable paths & hyperparameters
+│   └── config.py
 │
 ├── dataset/
-│   ├── HAM10000_metadata.csv   # (you provide this)
-│   └── HAM10000_images/        # (you provide this)
+│   ├── HAM10000_metadata.csv
+│   └── HAM10000_images/
 │
 ├── models/
-│   └── skin_cancer_resnet18.pth  # created by train.py
+│   └── skin_cancer_resnet18.pth
 │
 ├── src/
-│   ├── prepare_data.py         # validates data, creates train/val/test splits
-│   ├── dataset.py              # Dataset class + transforms
-│   ├── model.py                # model architecture (modular)
-│   ├── train.py                # training pipeline
-│   ├── evaluate.py             # test-set evaluation pipeline
-│   ├── predict.py              # CLI single-image prediction
-│   ├── inference.py            # shared inference logic (CLI + app)
-│   ├── gradcam.py              # optional interpretability module
-│   └── utils.py                # seeding, early stopping, checkpoint I/O
+│   ├── prepare_data.py
+│   ├── dataset.py
+│   ├── model.py
+│   ├── train.py
+│   ├── evaluate.py
+│   ├── predict.py
+│   ├── inference.py
+│   ├── gradcam.py
+│   └── utils.py
 │
-├── results/                    # generated plots & metrics (after training/eval)
+├── results/
+│
 └── notebooks/
     └── experimentation.ipynb
 ```
@@ -78,10 +87,13 @@ derma-ai/
 
 ## 4. Dataset Setup
 
-1. Download **HAM10000** (e.g. from the ISIC archive / Kaggle "Skin Cancer MNIST: HAM10000").
-2. Place the files so the project looks like this:
+1. Download the **HAM10000 dataset** from the ISIC Archive or Kaggle (Skin Cancer MNIST: HAM10000).
+2. Extract the downloaded files.
+3. Place the dataset inside the `dataset/` directory.
 
-```
+Expected structure:
+
+```text
 dataset/
 ├── HAM10000_metadata.csv
 └── HAM10000_images/
@@ -90,34 +102,47 @@ dataset/
     └── ...
 ```
 
-The metadata CSV must contain at least an `image_id` column and a `dx`
-column (the diagnosis label). If it also contains `lesion_id`, the data
-preparation script will use it to perform a **leakage-free, lesion-grouped
-split** — all images belonging to the same lesion stay in the same split.
-If `lesion_id` is absent, a plain stratified image-level split is used
-instead, and a warning is printed documenting this limitation.
+The metadata CSV must contain at least:
+
+- `image_id` — Image identifier
+- `dx` — Diagnosis label
+
+If the CSV also contains `lesion_id`, the data preparation script uses it to create lesion-grouped splits, ensuring images belonging to the same lesion do not appear in different subsets.
+
+If `lesion_id` is unavailable, a stratified image-level split is used instead.
 
 ---
 
 ## 5. Installation
 
+**Step 1 — Clone the repository**
+
+```bash
+git clone https://github.com/your-username/derma-ai.git
+cd derma-ai
+```
+
+**Step 2 — Create a virtual environment**
+
 ```bash
 python -m venv venv
 ```
 
-Activate the environment:
+**Step 3 — Activate the environment**
 
-**Windows:**
+Windows:
+
 ```bash
 venv\Scripts\activate
 ```
 
-**Linux/macOS:**
+Linux/macOS:
+
 ```bash
 source venv/bin/activate
 ```
 
-Install dependencies:
+**Step 4 — Install dependencies**
 
 ```bash
 pip install -r requirements.txt
@@ -127,133 +152,225 @@ pip install -r requirements.txt
 
 ## 6. Running the Pipeline
 
-**Step 1 — Prepare data** (validates dataset, creates splits):
+### Step 1 — Prepare Dataset
+
+Validate the dataset and generate train, validation, and test splits.
+
 ```bash
 python src/prepare_data.py
 ```
-Generates `dataset/train.csv`, `dataset/val.csv`, `dataset/test.csv`, and
-`dataset/class_to_idx.json`.
 
-**Step 2 — Train the model:**
+Generated files:
+
+- `dataset/train.csv`
+- `dataset/val.csv`
+- `dataset/test.csv`
+- `dataset/class_to_idx.json`
+
+### Step 2 — Train the Model
+
 ```bash
 python src/train.py
 ```
-Trains ResNet18 with transfer learning, class-weighted loss, augmentation,
-AdamW, ReduceLROnPlateau, and early stopping. Saves the best checkpoint to
-`models/skin_cancer_resnet18.pth` and training curves to
-`results/training_history.png`.
 
-**Step 3 — Evaluate on the test set:**
+The training pipeline uses:
+
+- ResNet18 transfer learning
+- Class-weighted CrossEntropyLoss
+- Data augmentation
+- AdamW optimizer
+- ReduceLROnPlateau learning-rate scheduler
+- Early stopping
+
+The best model checkpoint is saved to:
+
+```text
+models/skin_cancer_resnet18.pth
+```
+
+Training curves are saved to:
+
+```text
+results/training_history.png
+```
+
+### Step 3 — Evaluate the Model
+
 ```bash
 python src/evaluate.py
 ```
-Computes accuracy, macro/weighted precision-recall-F1, and (when
-mathematically valid) one-vs-rest ROC-AUC — all from real model
-predictions. Saves `results/confusion_matrix.png`,
-`results/roc_curve.png`, `results/classification_report.txt`, and
-`results/metrics.json`.
 
-**Step 4 — Predict a single image (CLI):**
+Evaluation metrics include:
+
+- Accuracy
+- Macro precision, recall, and F1-score
+- Weighted precision, recall, and F1-score
+- Confusion matrix
+- One-vs-rest ROC-AUC (when mathematically valid)
+
+Generated evaluation files:
+
+```text
+results/
+├── confusion_matrix.png
+├── roc_curve.png
+├── classification_report.txt
+└── metrics.json
+```
+
+### Step 4 — Predict a Single Image
+
 ```bash
 python src/predict.py --image path/to/image.jpg
 ```
 
-**Step 5 — Launch the web app:**
+### Step 5 — Launch the Web Application
+
 ```bash
 streamlit run app.py
 ```
+
+The application will open in your browser.
 
 ---
 
 ## 7. Model Architecture
 
-- Backbone: `torchvision.models.resnet18`, pretrained on ImageNet
-- Final fully-connected layer replaced to match the number of detected classes
-- Architecture is modular (`src/model.py`) — `resnet50` and
-  `efficientnet_b0` are already wired in as options; switch by changing
-  `MODEL_NAME` in `config/config.py`
+DermaAI uses **ResNet18**, a convolutional neural network pretrained on ImageNet.
+
+Key components:
+
+- Pretrained ResNet18 backbone
+- Transfer learning for skin-lesion classification
+- Modified fully connected layer for HAM10000 diagnostic classes
+- Configurable architecture through `config/config.py`
+
+The following architectures are also wired into the modular model implementation:
+
+- ResNet50
+- EfficientNet-B0
+
+To change the architecture, update `MODEL_NAME` in:
+
+```text
+config/config.py
+```
 
 ---
 
 ## 8. Data Split & Reproducibility
 
-- 80% train / 10% validation / 10% test
-- Stratified by diagnosis (`dx`), grouped by `lesion_id` when available to prevent leakage
-- `RANDOM_SEED = 42` used throughout (Python `random`, NumPy, PyTorch, CUDA)
-- Full determinism on GPU is not guaranteed — some cuDNN kernels are
-  inherently non-deterministic for performance reasons, so minor run-to-run
-  variance on CUDA is expected even with a fixed seed
+The dataset is divided into:
+
+| Dataset | Percentage |
+|---|---:|
+| Training | 80% |
+| Validation | 10% |
+| Testing | 10% |
+
+Additional measures:
+
+- Stratified splitting based on diagnosis (`dx`)
+- Lesion-grouped splitting when `lesion_id` is available
+- Fixed random seed (`RANDOM_SEED = 42`)
+- Reproducible Python, NumPy, and PyTorch random seeds
+
+Full GPU determinism is not guaranteed because some CUDA/cuDNN operations are inherently non-deterministic.
 
 ---
 
 ## 9. Handling Class Imbalance
 
-HAM10000 is heavily imbalanced (e.g. `nv` dominates the dataset). This
-project computes `class_weight="balanced"` weights from the **training
-split only** and applies them to `CrossEntropyLoss`. This is configurable
-via `USE_CLASS_WEIGHTS` in `config/config.py`.
+HAM10000 contains a significant class imbalance, with the melanocytic nevus (`nv`) category dominating the dataset.
+
+To address this issue, DermaAI uses:
+
+- Class weights calculated from the training split only
+- Weighted CrossEntropyLoss
+- Data augmentation during training
+
+Class weighting can be enabled or disabled using:
+
+```python
+USE_CLASS_WEIGHTS
+```
+
+in `config/config.py`.
 
 ---
 
-## 10. Metrics
+## 10. Evaluation Metrics
 
-All metrics are computed directly from the trained model's predictions on
-the held-out test set — nothing is fabricated. If you have not yet run
-`train.py` and `evaluate.py`, the app and scripts will clearly say:
+DermaAI evaluates the trained model using actual predictions on the held-out test dataset.
 
-> "Metrics unavailable — train and evaluate the model first."
+The evaluation pipeline reports:
+
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- Confusion matrix
+- ROC-AUC
+
+Metrics are generated only after training and evaluation.
+
+If the model has not been trained or evaluated, the application displays:
+
+```text
+Metrics unavailable — train and evaluate the model first.
+```
+
+No evaluation metrics are fabricated or hard-coded.
 
 ---
 
 ## 11. Tips for Improving Accuracy
 
-Transfer learning + class weighting + augmentation gets you a solid
-baseline, but real-world usefulness depends heavily on training budget and
-data quality. To push accuracy further:
+Potential improvements include:
 
-- Train for more epochs and/or unfreeze more of the backbone gradually
-  (progressive fine-tuning) once the new head has stabilized
-- Try `resnet50` or `efficientnet_b0` (already wired into `src/model.py`)
-- Use stronger/more targeted augmentation (RandomResizedCrop, mixup/cutmix)
-- Try focal loss instead of (or alongside) class weighting for severe imbalance
-- Tune the learning rate and batch size; try a cosine LR schedule
-- Use test-time augmentation (average predictions over several augmented views)
-- Ensemble two or more trained models
-- Use a grouped, patient/lesion-level split (already implemented) so your
-  validation accuracy reflects real generalization rather than leakage
-- Collect or incorporate more data for minority classes (`df`, `vasc`, `akiec`)
+- Increasing the number of training epochs
+- Using progressive fine-tuning
+- Experimenting with ResNet50 or EfficientNet-B0
+- Applying stronger data augmentation
+- Experimenting with Focal Loss
+- Tuning learning rates and batch sizes
+- Using cosine learning-rate scheduling
+- Applying test-time augmentation
+- Experimenting with model ensembles
+- Incorporating additional minority-class samples
 
-None of this changes the fact that this remains a research/educational
-tool, not a clinical-grade diagnostic system.
+These techniques may improve performance but do not guarantee better real-world clinical outcomes.
 
 ---
 
 ## 12. Limitations
 
-- HAM10000 is not representative of all skin tones, lesion types, or imaging conditions
-- The model can be confidently wrong, especially on out-of-distribution images
-- Grad-CAM visualizations show correlation with model attention, not proof of correct medical reasoning
-- This system has not been clinically validated and is not a substitute for professional dermatological evaluation
+- HAM10000 may not represent all skin tones, lesion types, or imaging conditions.
+- Predictions may be incorrect, including highly confident predictions.
+- Performance on external datasets may differ significantly.
+- Grad-CAM visualizations indicate model attention, not proof of correct medical reasoning.
+- The system has not undergone clinical validation.
+- It is not suitable for independent medical diagnosis or treatment decisions.
 
 ---
 
 ## 13. Future Improvements
 
-- Vision Transformer / EfficientNet backbones
-- Focal loss for extreme class imbalance
-- Patient-level external validation dataset
-- FastAPI backend + React/Next.js frontend
-- Docker containerization and cloud deployment
-- Model versioning and experiment tracking (e.g. MLflow, Weights & Biases)
+- Vision Transformer (ViT) architecture
+- Advanced EfficientNet backbones
+- Focal Loss for severe class imbalance
+- External patient-level validation
+- FastAPI backend with React/Next.js frontend
+- Docker containerization
+- Cloud deployment
+- Experiment tracking using MLflow or Weights & Biases
 
 ---
 
 ## 14. Medical Disclaimer
 
-This system is **not a medical device** and should **not** be used for
-diagnosis or treatment decisions. It is intended solely for educational
-and research demonstration of a deep-learning image-classification
-pipeline.
-#   S k i n - c a n c e r - d e t e c t i o n -  
- #   S k i n - c a n c e r - d e t e c t i o n -  
- 
+DermaAI is strictly an **educational and research-oriented project** demonstrating deep-learning-based skin-lesion image classification.
+
+It is not a certified medical device, has not been clinically validated, and must not be used for diagnosis, treatment recommendations, or medical decision-making.
+
+Always consult a qualified dermatologist or healthcare professional for medical evaluation.
